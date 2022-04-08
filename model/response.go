@@ -1,6 +1,6 @@
 package model
 
 type GeneralResponse struct {
-	Status  int    `json:"Status"`
-	Message string `json:"Message"`
+	status  int    `json:"Status"`
+	message string `json:"Message"`
 }
