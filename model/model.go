@@ -1,9 +1,9 @@
 package model
 
-type user struct {
+type User struct {
 	ID            int    `json:"ID"`
-	username      string `json:"Username"`
-	email         string `json:"email"`
-	password      string `json:"password"`
-	blockedStatus bool   `json:"Status"`
+	Username      string `json:"Username"`
+	Email         string `json:"email"`
+	Password      string `json:"password"`
+	BlockedStatus bool   `json:"Status"`
 }
