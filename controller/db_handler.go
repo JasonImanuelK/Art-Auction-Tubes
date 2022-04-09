@@ -8,7 +8,7 @@ import (
 )
 
 func connect() *sql.DB {
-	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/lelang")
+	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/tubes_pbp")
 	if err != nil {
 		log.Fatal(err)
 	}

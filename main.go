@@ -16,6 +16,10 @@ func main() {
 
 	router.HandleFunc("/login", controller.Login).Methods("PUT")
 	router.HandleFunc("/logout", controller.Logout).Methods("GET")
+	router.HandleFunc("/picture/{id}", controller.ReportPicture).Methods("PUT")
+	router.HandleFunc("/users", controller.GetUsers).Methods("GET")
+	router.HandleFunc("/users/{key}", controller.GetUsers).Methods("GET")
+	router.HandleFunc("/users/{id}", controller.ChangeBanStatus).Methods("PUT")
 
 	http.Handle("/", router)
 	fmt.Println("Connected to port 8080")
