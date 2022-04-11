@@ -74,3 +74,35 @@ func GetMarketListByName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(MarketResponse)
 }
+
+func InsertMarket(w http.ResponseWriter, r *http.Request) {
+	db := connect()
+	defer db.Close()
+
+	err := r.ParseForm()
+	if err != nil {
+		return
+	}
+
+	StartingDate := r.Form.Get("startingDate")
+	Deadline := r.Form.Get("deadline")
+	StartingBid := r.Form.Get("startingBid")
+	BuyoutBid := r.Form.Get("buyoutBid")
+	DatePosted := r.Form.Get("datePosted")
+	ImageId := r.Form.Get("imageId")
+	Status := r.Form.Get("status")
+
+	_, errQuery := db.Exec("INSERT INTO marketlist (startingDate,deadline,startingBid,buyoutBid,datePosted,imageId,status) values (?,?,?,?,?,?,?)", StartingDate, Deadline, StartingBid, BuyoutBid, DatePosted, ImageId, Status)
+
+	var response model.GeneralResponse
+	if errQuery == nil {
+		response.Status = 200
+		response.Message = "success"
+
+	} else {
+		response.Status = 400
+		response.Message = "insert failed"
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
