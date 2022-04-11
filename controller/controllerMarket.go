@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -86,13 +88,12 @@ func InsertMarket(w http.ResponseWriter, r *http.Request) {
 
 	StartingDate := r.Form.Get("startingDate")
 	Deadline := r.Form.Get("deadline")
-	StartingBid := r.Form.Get("startingBid")
-	BuyoutBid := r.Form.Get("buyoutBid")
+	StartingBid, _ := strconv.Atoi(r.Form.Get("StartingBid"))
+	BuyoutBid, _ := strconv.Atoi(r.Form.Get("BuyoutBid"))
 	DatePosted := r.Form.Get("datePosted")
-	ImageId := r.Form.Get("imageId")
-	Status := r.Form.Get("status")
+	ImageId, _ := strconv.Atoi(r.Form.Get("ImageId"))
 
-	_, errQuery := db.Exec("INSERT INTO marketlist (startingDate,deadline,startingBid,buyoutBid,datePosted,imageId,status) values (?,?,?,?,?,?,?)", StartingDate, Deadline, StartingBid, BuyoutBid, DatePosted, ImageId, Status)
+	_, errQuery := db.Exec("INSERT INTO marketlist (startingDate,deadline,startingBid,buyoutBid,datePosted,imageId,status) values (?,?,?,?,?,?,'active')", StartingDate, Deadline, StartingBid, BuyoutBid, DatePosted, ImageId)
 
 	var response model.GeneralResponse
 	if errQuery == nil {
@@ -102,6 +103,49 @@ func InsertMarket(w http.ResponseWriter, r *http.Request) {
 	} else {
 		response.Status = 400
 		response.Message = "insert failed"
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+func Buyout(w http.ResponseWriter, r *http.Request) {
+	db := connect()
+	defer db.Close()
+
+	err := r.ParseForm()
+	if err != nil {
+		return
+	}
+
+	marketId, _ := strconv.Atoi(r.Form.Get("marketId"))
+	userId, _ := strconv.Atoi(r.Form.Get("userId"))
+
+	var response model.GeneralResponse
+
+	rows, _ := db.Query("SELECT buyoutBid  FROM marketlist WHERE ID = ?", marketId)
+	var eth int
+
+	for rows.Next() {
+		if err := rows.Scan(&eth); err != nil {
+			log.Println(err)
+			response.Status = 500
+			response.Message = "internal error"
+		}
+	}
+
+	_, errQuery := db.Exec("UPDATE marketlist SET status = 'ended' WHERE id = ?", marketId)
+
+	_, errQuery1 := db.Exec("INSERT INTO bid (datePosted,etherium,userId,marketId) values (?,?,?,?)", time.Now().Format("01-02-2006"), eth, userId, marketId)
+
+	// kurangi uang user di sini
+
+	if errQuery == nil && errQuery1 == nil {
+		response.Status = 200
+		response.Message = "success"
+
+	} else {
+		response.Status = 400
+		response.Message = "internal error"
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
