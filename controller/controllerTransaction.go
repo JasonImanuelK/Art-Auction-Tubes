@@ -10,7 +10,7 @@ import (
 func GetLatestTransaction(w http.ResponseWriter, r *http.Request) {
 	//db := connect()
 	//defer db.Close()
-	//query := "SELECT * FROM marketlist WHERE stateStatus = soldOut ;"
+	//query := "SELECT * FROM marketlist WHERE stateStatus = soldOut ORDER BY datePosted DESC ;"
 
 	//rows, err := db.Query(query)
 	//var response model.MarketResponse
