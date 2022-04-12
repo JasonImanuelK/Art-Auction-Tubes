@@ -3,7 +3,6 @@ package controller
 import (
 	"Tubes/Art-Auction-Tubes/model"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -71,9 +70,7 @@ func Authenticate(next http.HandlerFunc, accessType int) http.HandlerFunc {
 }
 
 func validateUserToken(r *http.Request, accessType int) bool {
-	isAccessTokenValid, id, email, userType := validateTokenFromCookies(r)
-	fmt.Print(id, email, userType, isAccessTokenValid)
-
+	isAccessTokenValid, userType := validateTokenFromCookies(r)
 	if isAccessTokenValid {
 		isUserValid := userType == accessType
 		if isUserValid {
@@ -83,7 +80,7 @@ func validateUserToken(r *http.Request, accessType int) bool {
 	return false
 }
 
-func validateTokenFromCookies(r *http.Request) (bool, int, string, int) {
+func validateTokenFromCookies(r *http.Request) (bool, int) {
 	if cookie, err := r.Cookie(tokenName); err == nil {
 		accessToken := cookie.Value
 		accessClaims := &Claims{}
@@ -91,10 +88,10 @@ func validateTokenFromCookies(r *http.Request) (bool, int, string, int) {
 			return jwtKey, nil
 		})
 		if err == nil && parsedToken.Valid {
-			return true, accessClaims.ID, accessClaims.Username, accessClaims.UserType
+			return true, accessClaims.UserType
 		}
 	}
-	return false, -1, "", -1
+	return false, -1
 }
 
 func sendUnAuthorizedResponse(w http.ResponseWriter) {
