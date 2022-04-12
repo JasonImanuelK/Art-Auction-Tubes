@@ -27,7 +27,7 @@ type Bid struct {
 	DatePosted time.Time `json:"datePosted"`
 	Etherium   float64   `json:"etherium"`
 	UserID     int       `json:"userId"`
-	MarketId   int       `json:"marketId`
+	MarketId   int       `json:"marketId"`
 }
 
 type SuccessResponse struct {
