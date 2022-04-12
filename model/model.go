@@ -8,6 +8,7 @@ type User struct {
 	Email         string `json:"email"`
 	Password      string `json:"password"`
 	BlockedStatus bool   `json:"Status"`
+	UserType      int    `json:"userType"`
 }
 
 type Image struct {
