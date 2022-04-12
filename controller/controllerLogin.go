@@ -5,7 +5,14 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	bcrypt "golang.org/x/crypto/bcrypt"
 )
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	db := connect()
@@ -25,8 +32,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
-
-	err := db.QueryRow("SELECT id,blockedStatus,userType FROM user where username = ? and password = ?", username, password).Scan(&user.ID, &user.BlockedStatus, &user.UserType)
+	hashedPassword, _ := hashPassword(password)
+	err := db.QueryRow("SELECT id,blockedStatus,userType FROM user where username = ? and password = ?", username, hashedPassword).Scan(&user.ID, &user.BlockedStatus, &user.UserType)
 	user.Username = username
 
 	switch {
@@ -63,9 +70,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 	email := r.Form.Get("email")
+	hashedPassword, _ := hashPassword(password)
 	var id int
 
-	_, errQuery := db.Exec("INSERT INTO user(username, password, email,blockedStatus,userType) values (?,?,?,0,1)", username, password, email)
+	_, errQuery := db.Exec("INSERT INTO user(username, password, email,blockedStatus,userType) values (?,?,?,0,0)", username, hashedPassword, email)
 
 	w.Header().Set("Content-Type", "application/json")
 	var response model.GeneralResponse
