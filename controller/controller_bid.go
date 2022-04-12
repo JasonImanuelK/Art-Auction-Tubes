@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"Tubes/Art-Auction-Tubes/model"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -11,11 +12,11 @@ func InsertBid(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	err := r.ParseForm()
-
+	var response model.BidResponse
 	if err != nil {
 		return
 	}
-	ether, _ := strconv.FormatFloat(r.Form.Get("etherium"))
+	ether, _ := strconv.Atoi(r.Form.Get("etherium"))
 	userid, _ := strconv.Atoi(r.Form.Get("userId"))
 	marketid, _ := strconv.Atoi(r.Form.Get("marketId"))
 

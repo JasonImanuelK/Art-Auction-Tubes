@@ -24,8 +24,30 @@ type Image struct {
 
 type Bid struct {
 	ID         int       `json:"id"`
-	DatePosted time.time `json:"datePosted"`
+	DatePosted time.Time `json:"datePosted"`
 	Etherium   float64   `json:"etherium"`
 	UserID     int       `json:"userId"`
 	MarketId   int       `json:"marketId`
+}
+
+type SuccessResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type ErrorResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type BidResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Data    Bid    `json:"data"`
+}
+
+type BidsResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Data    []Bid  `json:"data"`
 }
