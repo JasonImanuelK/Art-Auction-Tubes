@@ -22,6 +22,8 @@ func main() {
 	router.HandleFunc("/users", controller.Authenticate(controller.GetUsers, 2)).Methods("GET")
 	router.HandleFunc("/users/{key}", controller.Authenticate(controller.GetUsers, 2)).Methods("GET")
 	router.HandleFunc("/users/{id}", controller.Authenticate(controller.ChangeBanStatus, 1)).Methods("PUT")
+	router.HandleFunc("/bid/{marketId,userId,Etherium}", controller.InsertBid).Methods("PUT")
+	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods(("GET"))
 
 	http.Handle("/", router)
 	fmt.Println("Connected to port 8080")
