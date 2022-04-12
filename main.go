@@ -14,12 +14,14 @@ import (
 func main() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/login", controller.Login).Methods("PUT")
-	router.HandleFunc("/logout", controller.Logout).Methods("GET")
-	router.HandleFunc("/picture/{id}", controller.ReportPicture).Methods("PUT")
-	router.HandleFunc("/users", controller.GetUsers).Methods("GET")
-	router.HandleFunc("/users/{key}", controller.GetUsers).Methods("GET")
-	router.HandleFunc("/users/{id}", controller.ChangeBanStatus).Methods("PUT")
+	// accessType 0 : User Biasa, 1 : Admin aja, 2 : 2 2nya bisa tapi butuh cookie.
+	router.HandleFunc("/register", controller.Register).Methods("PUT")
+	router.HandleFunc("/login", controller.Login).Methods("POST")
+	router.HandleFunc("/logout", controller.Authenticate(controller.Logout, 2)).Methods("GET")
+	router.HandleFunc("/picture/{id}", controller.Authenticate(controller.ReportPicture, 0)).Methods("PUT")
+	router.HandleFunc("/users", controller.Authenticate(controller.GetUsers, 2)).Methods("GET")
+	router.HandleFunc("/users/{key}", controller.Authenticate(controller.GetUsers, 2)).Methods("GET")
+	router.HandleFunc("/users/{id}", controller.Authenticate(controller.ChangeBanStatus, 1)).Methods("PUT")
 
 	http.Handle("/", router)
 	fmt.Println("Connected to port 8080")
