@@ -21,3 +21,11 @@ type Image struct {
 	Description string    `form:"description" json:"description"`
 	Status      int       `form:"status" json:"status"`
 }
+
+type Bid struct {
+	ID         int       `json:"id"`
+	DatePosted time.time `json:"datePosted"`
+	Etherium   float64   `json:"etherium"`
+	UserID     int       `json:"userId"`
+	MarketId   int       `json:"marketId`
+}
