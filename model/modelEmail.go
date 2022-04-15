@@ -2,10 +2,11 @@ package model
 
 import "time"
 
-type ListEmail []struct {
+type ListEmail struct {
 	Title    string
-	Name     string
+	Username string
 	Email    string
 	Date     time.Time
 	Etherium float64
+	MarketId int
 }
