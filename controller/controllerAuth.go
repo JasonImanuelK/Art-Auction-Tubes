@@ -72,7 +72,10 @@ func Authenticate(next http.HandlerFunc, accessType int) http.HandlerFunc {
 func validateUserToken(r *http.Request, accessType int) bool {
 	isAccessTokenValid, userType := validateTokenFromCookies(r)
 	if isAccessTokenValid {
-		isUserValid := userType == accessType || userType == 2
+		isUserValid := userType == accessType
+		if accessType == 2 {
+			isUserValid = true
+		}
 		if isUserValid {
 			return true
 		}
