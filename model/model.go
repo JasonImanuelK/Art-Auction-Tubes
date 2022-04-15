@@ -51,3 +51,20 @@ type BidsResponse struct {
 	Message string `json:"message"`
 	Data    []Bid  `json:"data"`
 }
+
+type Accounting struct {
+	Tax    float64 `json:"tax"`
+	Income float64 `json:"income"`
+}
+
+type AccountingResponse struct {
+	Status  int        `json:"status"`
+	Message string     `json:"message"`
+	Data    Accounting `json:"data"`
+}
+
+type AccountingsResponse struct {
+	Status  int          `json:"status"`
+	Message string       `json:"message"`
+	Data    []Accounting `json:"data"`
+}
