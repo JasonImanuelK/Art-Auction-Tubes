@@ -1,14 +1,13 @@
 package main
 
 import (
-	"Tubes/Art-Auction-Tubes/controller"
-
 	"fmt"
 	"log"
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"github.com/tubes/Art-Auction-Tubes/controller"
 )
 
 func main() {
