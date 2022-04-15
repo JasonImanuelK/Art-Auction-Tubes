@@ -15,7 +15,7 @@ func main() {
 	router := mux.NewRouter()
 
 	// accessType 0 : User Biasa, 1 : Admin aja, 2 : 2 2nya bisa tapi butuh cookie.
-	router.HandleFunc("/register", controller.Register).Methods("PUT")
+	router.HandleFunc("/register", controller.Register).Methods("POST")
 	router.HandleFunc("/login", controller.Login).Methods("POST")
 	router.HandleFunc("/logout", controller.Authenticate(controller.Logout, 2)).Methods("GET")
 	router.HandleFunc("/picture/{id}", controller.Authenticate(controller.ReportPicture, 0)).Methods("PUT")

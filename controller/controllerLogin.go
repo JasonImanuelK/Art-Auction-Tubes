@@ -10,8 +10,16 @@ import (
 )
 
 func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 5)
 	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		log.Printf(err.Error())
+	}
+	return err == nil
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -33,21 +41,27 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 	hashedPassword, _ := hashPassword(password)
-	err := db.QueryRow("SELECT id,blockedStatus,userType FROM user where username = ? and password = ?", username, hashedPassword).Scan(&user.ID, &user.BlockedStatus, &user.UserType)
+	err := db.QueryRow("SELECT id,blockedStatus,userType FROM user where username = ?", username).Scan(&user.ID, &user.BlockedStatus, &user.UserType)
 	user.Username = username
 
+	var response model.GeneralResponse
 	switch {
 	case err != nil:
 		log.Print(err)
-		var response model.GeneralResponse
 		response.Status = 400
 		response.Message = "User not found."
 		json.NewEncoder(w).Encode(response)
 	default:
-		generateToken(w, user.ID, user.Username, user.UserType)
-		var response model.GeneralResponse
-		response.Status = 200
-		response.Message = "Login Success"
+		match := CheckPasswordHash(password, hashedPassword)
+		if match {
+			generateToken(w, user.ID, user.Username, user.UserType)
+			response.Status = 200
+			response.Message = "Login Success"
+		} else {
+			response.Status = 400
+			response.Message = "Password Failed"
+		}
+
 		json.NewEncoder(w).Encode(response)
 	}
 }
@@ -59,8 +73,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	errForm := r.ParseForm()
+
+	var response model.GeneralResponse
 	if errForm != nil {
-		var response model.GeneralResponse
 		response.Status = 400
 		response.Message = "Bad Request"
 		json.NewEncoder(w).Encode(response)
@@ -71,31 +86,42 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	password := r.Form.Get("password")
 	email := r.Form.Get("email")
 	hashedPassword, _ := hashPassword(password)
+
 	var id int
-
+	var hash string
 	_, errQuery := db.Exec("INSERT INTO user(username, password, email,blockedStatus,userType) values (?,?,?,0,0)", username, hashedPassword, email)
-
-	w.Header().Set("Content-Type", "application/json")
-	var response model.GeneralResponse
-	json.NewEncoder(w).Encode(response)
 
 	if errQuery != nil {
 		response.Status = 400
 		response.Message = "Bad Request"
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 
-	err := db.QueryRow("SELECT id FROM user where username = ? and password = ?", username, password).Scan(&id)
+	rows, err := db.Query("SELECT id, password FROM user where username = '" + username + "'")
+	if err != nil {
+		log.Print(err)
+	}
 
-	if err == nil {
-		response.Status = 200
-		response.Message = "Register Success"
+	rows.Next()
+
+	if err := rows.Scan(&id, &hash); err == nil {
+		match := CheckPasswordHash(password, hash)
+		if match {
+			response.Status = 200
+			response.Message = "Register Success"
+			generateToken(w, id, username, 0)
+		} else {
+			response.Status = 400
+			response.Message = "Register Failed"
+		}
 	} else {
+		log.Fatal(err.Error())
 		response.Status = 400
 		response.Message = "Register Failed"
 	}
 
-	generateToken(w, id, username, 0)
+	json.NewEncoder(w).Encode(response)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
