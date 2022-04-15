@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -21,19 +22,16 @@ func InsertBid(w http.ResponseWriter, r *http.Request) {
 	userid, _ := strconv.Atoi(r.Form.Get("userId"))
 	marketid, _ := strconv.Atoi(r.Form.Get("marketId"))
 
-	if userid != 0 && marketid != 0 {
-		_, errQuery := db.Exec("INSERT INTO `bid`(`id`,`datePosted`,`etherium`,`userId`,`marketId`) VALUES (NULL,current_timestamp(),?,?,?);", ether, userid, marketid)
-		if errQuery != nil {
-			response.Status = 500
-			response.Message = "Internal Server Error"
-		} else {
-			response.Status = 200
-			response.Message = "Success Insert"
-		}
-	} else {
+	_, errQuery := db.Exec("INSERT INTO bid(datePosted,etherium,userId,marketId) VALUES (current_timestamp(),?,?,?);", ether, userid, marketid)
+	if errQuery != nil {
+		log.Print(errQuery.Error())
 		response.Status = 400
 		response.Message = "Bad Request - Insert Failed"
+		json.NewEncoder(w).Encode(response)
+	} else {
+		response.Status = 200
+		response.Message = "Success Insert"
+		json.NewEncoder(w).Encode(response)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+
 }
