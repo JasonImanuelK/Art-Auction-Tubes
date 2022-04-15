@@ -25,9 +25,14 @@ func ResetRedis(w http.ResponseWriter, r *http.Request) {
 		DB:       0,
 	})
 
+	er1r := r.ParseForm()
+	if er1r != nil {
+		return
+	}
+
 	email := r.Form.Get("email")
 
-	err := client.Set(ctx, email, 1, 0).Err()
+	err := client.Set(ctx, email, 0, 0).Err()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -58,14 +63,20 @@ func GetMarketListByDate(w http.ResponseWriter, r *http.Request) {
 		DB:       0,
 	})
 
+	er1r := r.ParseForm()
+	if er1r != nil {
+		return
+	}
+
 	email := r.Form.Get("email")
+
+	log.Print(email)
 
 	current, err1 := client.Get(ctx, email).Result()
 
 	current2, _ := strconv.Atoi(current)
 
 	if err1 != nil {
-
 		err := client.Set(ctx, email, 1, 0).Err()
 		if err != nil {
 			fmt.Println(err)
@@ -73,7 +84,10 @@ func GetMarketListByDate(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	rows, _ := db.Query("SELECT *  FROM marketlist WHERE ID >= ?", current2)
+	rows, _ := db.Query("SELECT *  FROM marketlist WHERE ID >= ? LIMIT 10", current2)
+
+	log.Print(current)
+
 	var MarketResponse model.MarketResponse
 	var data model.Market
 
@@ -109,7 +123,7 @@ func GetMarketListById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	marketId := vars["marketId"]
+	marketId, _ := strconv.Atoi(vars["marketId"])
 
 	rows, _ := db.Query("SELECT *  FROM marketlist WHERE ID = ?", marketId)
 	var MarketResponse model.MarketResponse
@@ -142,9 +156,8 @@ func GetMarketListByName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	marketId := vars["marketId"]
-
-	rows, _ := db.Query("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.Status FROM marketlist JOIN gambar WHERE gambar.title LIKE '%?%'", marketId)
+	name := vars["name"]
+	rows, _ := db.Query(("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.Status FROM marketlist JOIN gambar WHERE gambar.title LIKE '%" + name + "%'"))
 	var MarketResponse model.MarketResponse
 	var data model.Market
 
@@ -167,6 +180,7 @@ func GetMarketListByName(w http.ResponseWriter, r *http.Request) {
 }
 
 func InsertMarket(w http.ResponseWriter, r *http.Request) {
+
 	db := connect()
 	defer db.Close()
 

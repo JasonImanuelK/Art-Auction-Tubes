@@ -8,7 +8,7 @@ type Market struct {
 	BuyoutBid    int    `json:"buyoutBid"`
 	DatePosted   string `json:"datePosted"`
 	ImageId      int    `json:"imageId"`
-	Status       int    `json:"status"`
+	Status       string `json:"status"`
 }
 
 type MarketResponse struct {
