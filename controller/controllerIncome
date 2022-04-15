@@ -1,0 +1,28 @@
+package controller
+
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+	"strconv"
+
+	"github.com/tubes/Art-Auction-Tubes/model"
+)
+
+func GetIncome(w http.ResponseWriter, r *http.Request) {
+	db := connect()
+	defer db.Close()
+	query := "SELECT SUM(buyOutBid) FROM marketlist;"
+
+	rows, err := db.Query(query)
+	if err != nil {
+		return 0, err
+	} else {
+		var buyOutBid int64
+		for rows.Next() {
+			rows.Scan(&buyOutBid)
+		}
+		return buyOutBid, nil
+	}
+
+}

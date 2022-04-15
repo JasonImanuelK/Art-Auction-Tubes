@@ -1,8 +1,9 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/tubes/Art-Auction-Tubes/model"
@@ -28,12 +29,24 @@ func GetLatestTransaction(w http.ResponseWriter, r *http.Request) {
 	var markets []model.Market
 
 	for rows.Next() {
-		if err := rows.Scan(&market.ID, &market.StartingDate, &market.Deadline, &market.StartingBid, &market.BuyoutBid, &market.DatePosted, &market.Status, &market.ImageId); err != nil {
-			log.Println(err)
-			return
+
+		var checkStartingDate sql.NullTime
+		var checkDeadline sql.NullTime
+		var checkDatePosted sql.NullTime
+		if err := rows.Scan(&market.ID, checkStartingDate, checkDeadline, &market.StartingBid, &market.BuyoutBid, checkDatePosted, &market.Status, &market.ImageId); err != nil {
+			fmt.Println(err.Error())
 		} else {
 			markets = append(markets, market)
 		}
 	}
+	if len(markets) > 0 {
+		response.Status = 200
+		response.Message = "Success"
+	} else {
+		response.Status = 404
+		response.Message = "Error - Data Not Found with Authentication Provided"
+	}
 
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
