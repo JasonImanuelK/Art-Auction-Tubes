@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"Tubes/Art-Auction-Tubes/model"
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"github.com/tubes/Art-Auction-Tubes/model"
 )
 
 func InsertBid(w http.ResponseWriter, r *http.Request) {
