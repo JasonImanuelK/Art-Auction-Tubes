@@ -1,15 +1,17 @@
 package controller
 
 import (
-	"Tubes/Art-Auction-Tubes/model"
 	"encoding/json"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/tubes/Art-Auction-Tubes/model"
 )
 
-var jwtKey = []byte("mrowong")
+var token = os.Getenv("TOKEN")
+var jwtKey = []byte(token)
 var tokenName = "token"
 
 type Claims struct {

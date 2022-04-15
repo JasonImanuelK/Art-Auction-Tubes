@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"time"
 
+	"github.com/go-co-op/gocron"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/tubes/Art-Auction-Tubes/controller"
 )
 
@@ -25,7 +29,21 @@ func main() {
 	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods(("GET"))
 
 	http.Handle("/", router)
+
 	fmt.Println("Connected to port 8080")
 	log.Println("Connected to port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file.")
+	}
+
+	passwordEmail := os.Getenv("PASSWORD_EMAIL")
+
+	s := gocron.NewScheduler(time.UTC)
+	s.Every(24).Hours().Do(func() { fmt.Print("lola") })
+	s.Every(24).Hours().Do(func() { fmt.Print() })
+	s.StartBlocking()
+
 }

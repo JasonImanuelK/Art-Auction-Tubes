@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"Tubes/Art-Auction-Tubes/model"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -9,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/tubes/Art-Auction-Tubes/model"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"

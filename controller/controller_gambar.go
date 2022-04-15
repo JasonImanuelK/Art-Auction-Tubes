@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"Tubes/Art-Auction-Tubes/model"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/tubes/Art-Auction-Tubes/model"
 
 	"github.com/gorilla/mux"
 )

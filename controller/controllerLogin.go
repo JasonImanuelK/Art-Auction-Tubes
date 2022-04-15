@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"Tubes/Art-Auction-Tubes/model"
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/tubes/Art-Auction-Tubes/model"
 
 	bcrypt "golang.org/x/crypto/bcrypt"
 )
@@ -16,9 +17,6 @@ func hashPassword(password string) (string, error) {
 
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	if err != nil {
-		log.Printf(err.Error())
-	}
 	return err == nil
 }
 
