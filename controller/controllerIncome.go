@@ -31,7 +31,7 @@ func GetIncome(w http.ResponseWriter, r *http.Request) {
 	var incomes []model.Market
 	for rows.Next() {
 		var state model.Market
-		if err := rows.Scan(&state.Status); err != nil {
+		if err := rows.Scan(&state.BuyoutBid); err != nil {
 			fmt.Println(err.Error())
 		} else {
 			incomes = append(incomes, state)
