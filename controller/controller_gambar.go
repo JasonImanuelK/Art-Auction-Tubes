@@ -48,7 +48,7 @@ func ReportPicture(w http.ResponseWriter, r *http.Request) {
 	)
 	fmt.Println("Masuk line 48")
 
-	var response model.Gambaresponse
+	var response model.GeneralResponse
 	if errQuery == nil {
 		response.Status = 200
 		response.Message = "Success Add Report Picture"

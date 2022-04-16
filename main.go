@@ -30,9 +30,9 @@ func main() {
 	router.HandleFunc("/tax", controller.InsertTax).Methods("POST")
 	router.HandleFunc("/tax", controller.GetTax).Methods("GET")
 	//router.HandleFunc("/income",coontroller.GetIncome).Methods("GET")
-	router.HandleFunc("/market", controller.Authenticate(controller.GetMarketListByDate, 2)).Methods("POST")
-	router.HandleFunc("/market/id/{id}", controller.Authenticate(controller.GetMarketListById, 2)).Methods("GET")
-	router.HandleFunc("/market/{name}", controller.Authenticate(controller.GetMarketListByName, 2)).Methods("GET")
+	router.HandleFunc("/marketlist", controller.Authenticate(controller.GetMarketListByDate, 2)).Methods("POST")
+	router.HandleFunc("/marketlist/id/{id}", controller.Authenticate(controller.GetMarketListById, 2)).Methods("GET")
+	router.HandleFunc("/marketlist/{name}", controller.Authenticate(controller.GetMarketListByName, 2)).Methods("GET")
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
