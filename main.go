@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"github.com/tubes/Art-Auction-Tubes/controller"
 )
 
@@ -24,8 +25,16 @@ func main() {
 	router.HandleFunc("/bid}", controller.InsertBid).Methods("POST")
 	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods(("GET"))
 
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowCredentials: true,
+	})
+
+	handler := corsHandler.Handler(router)
+
 	http.Handle("/", router)
 	fmt.Println("Connected to port 8080")
 	log.Println("Connected to port 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }

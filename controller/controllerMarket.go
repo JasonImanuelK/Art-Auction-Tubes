@@ -225,31 +225,51 @@ func Buyout(w http.ResponseWriter, r *http.Request) {
 
 	var response model.GeneralResponse
 
-	rows, _ := db.Query("SELECT buyoutBid  FROM marketlist WHERE ID = ?", marketId)
+	rows, _ := db.Query("SELECT buyoutBid,imageId  FROM marketlist WHERE ID = ?", marketId)
 	var eth int
+	var imageId int
 
 	for rows.Next() {
-		if err := rows.Scan(&eth); err != nil {
+		if err := rows.Scan(&eth, &imageId); err != nil {
 			log.Println(err)
 			response.Status = 500
 			response.Message = "internal error"
 		}
 	}
 
-	_, errQuery := db.Exec("UPDATE marketlist SET status = 'ended' WHERE id = ?", marketId)
+	rows2, _ := db.Query("SELECT coin FROM user_wallet WHERE user_id = ?", userId)
 
-	_, errQuery1 := db.Exec("INSERT INTO bid (datePosted,etherium,userId,marketId) values (?,?,?,?)", time.Now().Format("01-02-2006"), eth, userId, marketId)
+	var coin int
+	for rows2.Next() {
+		if err := rows.Scan(&coin); err != nil {
+			log.Println(err)
+			response.Status = 500
+			response.Message = "internal error"
+		}
+	}
 
-	// kurangi uang user di sini
+	if coin >= eth {
+		_, errQuery := db.Exec("UPDATE marketlist SET status = 'ended' WHERE id = ?", marketId)
+		_, errQuery1 := db.Exec("INSERT INTO bid (datePosted,etherium,userId,marketId) values (?,?,?,?)", time.Now().Format("01-02-2006"), eth, userId, marketId)
 
-	if errQuery == nil && errQuery1 == nil {
-		response.Status = 200
-		response.Message = "success"
+		_, errQuery2 := db.Exec("UPDATE user_wallet SET coin = ? WHERE id = ?", (coin - eth), imageId)
+
+		_, errQuery3 := db.Exec("UPDATE iamge SET userId = ? WHERE id = ?", userId, userId)
+
+		if errQuery == nil && errQuery1 == nil && errQuery2 == nil && errQuery3 == nil {
+			response.Status = 200
+			response.Message = "success"
+
+		} else {
+			response.Status = 400
+			response.Message = "internal error"
+		}
 
 	} else {
 		response.Status = 400
-		response.Message = "internal error"
+		response.Message = "uang tidak cukup"
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
