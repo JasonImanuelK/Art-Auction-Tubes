@@ -18,7 +18,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	param := mux.Vars(r)
 	key := param["key"]
 
-	query := "SELECT id, username, email, password, blockedStatus FROM user WHERE userType = 0"
+	query := "SELECT id, username, email, password, blockedStatus FROM user WHERE userType = 0 AND blockedStatus = 0"
 
 	if key != "" {
 		query += " AND username LIKE '%" + key + "%'"
@@ -63,11 +63,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 func ChangeBanStatus(w http.ResponseWriter, r *http.Request) {
 	db := connect()
 	defer db.Close()
-
-	err := r.ParseForm()
-	if err != nil {
-		return
-	}
 
 	param := mux.Vars(r)
 	id := param["id"]

@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/tubes/Art-Auction-Tubes/model"
@@ -19,30 +18,9 @@ func ReportPicture(w http.ResponseWriter, r *http.Request) {
 	id := param["id"]
 	fmt.Println(id)
 
-	query := "SELECT report FROM image WHERE id = " + id
-
-	var report int
-
-	rows, err := db.Query(query)
-	if err != nil {
-		log.Print(err)
-	}
-
-	for rows.Next() {
-		if err := rows.Scan(&report); err != nil {
-			log.Fatal(err.Error())
-		}
-	}
-
-	fmt.Println("Masuk line 40", report)
-
-	report++
-
-	_, errQuery := db.Exec("UPDATE image SET report=? WHERE ID = ?",
-		report,
+	_, errQuery := db.Exec("UPDATE image SET report=report+1 WHERE ID = ?",
 		id,
 	)
-	fmt.Println("Masuk line 48")
 
 	var response model.GeneralResponse
 	if errQuery == nil {
