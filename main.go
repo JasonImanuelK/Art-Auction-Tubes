@@ -25,7 +25,10 @@ func main() {
 	router.HandleFunc("/users/{key}", controller.Authenticate(controller.GetUsers, 2)).Methods("GET")
 	router.HandleFunc("/users/{id}", controller.Authenticate(controller.ChangeBanStatus, 1)).Methods("PUT")
 	router.HandleFunc("/bid", controller.InsertBid).Methods("POST")
-	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods(("GET"))
+	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods("GET")
+	router.HandleFunc("/tax", controller.InsertTax).Methods("POST")
+	router.HandleFunc("/tax", controller.GetTax).Methods("GET")
+	//router.HandleFunc("/income",coontroller.GetIncome).Methods("GET")
 
 	http.Handle("/", router)
 

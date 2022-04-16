@@ -46,7 +46,7 @@ func GetTax(w http.ResponseWriter, r *http.Request) {
 	tax := r.Form.Get("tax")
 	rows, err := db.Query(query, tax)
 
-	var response model.AccountingResponse
+	var response model.AccountingsResponse
 	if err != nil {
 		response.Status = 500
 		response.Message = "Internal Server Error;" + err.Error()
@@ -54,10 +54,11 @@ func GetTax(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	}
+
 	var accounts []model.Accounting
 	for rows.Next() {
 		var tax model.Accounting
-		if err := rows.Scan(&tax.Tax, &tax.Income); err != nil {
+		if err := rows.Scan(&tax.Tax); err != nil {
 			fmt.Println(err.Error())
 		} else {
 			accounts = append(accounts, tax)
@@ -66,6 +67,7 @@ func GetTax(w http.ResponseWriter, r *http.Request) {
 	if len(accounts) > 0 {
 		response.Status = 200
 		response.Message = "Success"
+		response.Data = accounts
 	} else {
 		response.Status = 404
 		response.Message = "Error - Data Not Found with Authentication Provided"
