@@ -15,18 +15,13 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	db := connect()
 	defer db.Close()
 
-	err := r.ParseForm()
-	if err != nil {
-		return
-	}
-
 	param := mux.Vars(r)
 	key := param["key"]
 
-	query := "SELECT * FROM user"
+	query := "SELECT id, username, email, password, blockedStatus FROM user WHERE userType = 0"
 
 	if key != "" {
-		query += " WHERE username LIKE '%" + key + "%'"
+		query += " AND username LIKE '%" + key + "%'"
 	}
 
 	rows, err := db.Query(query)
@@ -39,7 +34,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	var temp int
 
 	for rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.Email, &temp); err != nil {
+		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &temp); err != nil {
 			log.Fatal(err.Error())
 		} else {
 			if temp == 0 {
