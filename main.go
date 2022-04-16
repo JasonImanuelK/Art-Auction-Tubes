@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+
+	//"os"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -26,7 +27,10 @@ func main() {
 	router.HandleFunc("/users/{key}", controller.Authenticate(controller.GetUsers, 2)).Methods("GET")
 	router.HandleFunc("/users/{id}", controller.Authenticate(controller.ChangeBanStatus, 1)).Methods("PUT")
 	router.HandleFunc("/bid", controller.InsertBid).Methods("POST")
-	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods(("GET"))
+	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods("GET")
+	router.HandleFunc("/tax", controller.InsertTax).Methods("POST")
+	router.HandleFunc("/tax", controller.GetTax).Methods("GET")
+	//router.HandleFunc("/income",coontroller.GetIncome).Methods("GET")
 
 	http.Handle("/", router)
 
@@ -39,7 +43,7 @@ func main() {
 		log.Fatal("Error loading .env file.")
 	}
 
-	passwordEmail := os.Getenv("PASSWORD_EMAIL")
+	//passwordEmail := os.Getenv("PASSWORD_EMAIL")
 
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(24).Hours().Do(func() { fmt.Print("lola") })
