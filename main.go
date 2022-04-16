@@ -10,6 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 	"github.com/tubes/Art-Auction-Tubes/controller"
 )
 
@@ -30,10 +31,19 @@ func main() {
 	router.HandleFunc("/tax", controller.GetTax).Methods("GET")
 	//router.HandleFunc("/income",coontroller.GetIncome).Methods("GET")
 
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowCredentials: true,
+	})
+
+	handler := corsHandler.Handler(router)
+
 	http.Handle("/", router)
 
 	fmt.Println("Connected to port 8080")
 	log.Println("Connected to port 8080")
+	log.Fatal(http.ListenAndServe(":8080", handler))
 	log.Fatal(http.ListenAndServe(":8080", router))
 
 	err := godotenv.Load()
