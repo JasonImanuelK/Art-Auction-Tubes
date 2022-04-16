@@ -150,12 +150,9 @@ func GetMarketListByName(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	name := vars["name"]
-	rows, errQ := db.Query(("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.stateStatus FROM marketlist JOIN image WHERE image.title LIKE '%" + name + "%'"))
+	rows, _ := db.Query(("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.stateStatus FROM marketlist JOIN image WHERE image.title LIKE '%" + name + "%'"))
 	var MarketResponse model.MarketResponse
 	var data model.Market
-
-	log.Println(name)
-	log.Println(errQ)
 
 	for rows.Next() {
 		if err := rows.Scan(&data.ID, &data.StartingDate, &data.Deadline, &data.StartingBid, &data.BuyoutBid, &data.DatePosted, &data.ImageId, &data.Status); err != nil {
@@ -192,7 +189,7 @@ func InsertMarket(w http.ResponseWriter, r *http.Request) {
 	DatePosted := r.Form.Get("datePosted")
 	ImageId, _ := strconv.Atoi(r.Form.Get("ImageId"))
 
-	_, errQuery := db.Exec("INSERT INTO marketlist (startingDate,deadline,startingBid,buyoutBid,datePosted,imageId,status) values (?,?,?,?,?,?,'active')", StartingDate, Deadline, StartingBid, BuyoutBid, DatePosted, ImageId)
+	_, errQuery := db.Exec("INSERT INTO marketlist (startingDate,deadline,startingBid,buyoutBid,datePosted,imageId,stateStatus) values (?,?,?,?,?,?,'active')", StartingDate, Deadline, StartingBid, BuyoutBid, DatePosted, ImageId)
 
 	var response model.GeneralResponse
 	if errQuery == nil {
@@ -210,7 +207,6 @@ func InsertMarket(w http.ResponseWriter, r *http.Request) {
 func Buyout(w http.ResponseWriter, r *http.Request) {
 	db := connect()
 	defer db.Close()
-
 	err := r.ParseForm()
 	if err != nil {
 		return
@@ -237,7 +233,7 @@ func Buyout(w http.ResponseWriter, r *http.Request) {
 
 	var coin int
 	for rows2.Next() {
-		if err := rows.Scan(&coin); err != nil {
+		if err := rows2.Scan(&coin); err != nil {
 			log.Println(err)
 			response.Status = 500
 			response.Message = "internal error"
@@ -245,18 +241,22 @@ func Buyout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if coin >= eth {
-		_, errQuery := db.Exec("UPDATE marketlist SET status = 'ended' WHERE id = ?", marketId)
-		_, errQuery1 := db.Exec("INSERT INTO bid (datePosted,etherium,userId,marketId) values (?,?,?,?)", time.Now().Format("01-02-2006"), eth, userId, marketId)
+		_, errQuery := db.Exec("UPDATE marketlist SET stateStatus = 0 WHERE id = ?", marketId)
+		_, errQuery1 := db.Exec("INSERT INTO bid (datePosted,etherium,userId,marketId) values (?,?,?,?)", time.Now().Format("2022-04-08"), eth, userId, marketId)
 
-		_, errQuery2 := db.Exec("UPDATE user_wallet SET coin = ? WHERE id = ?", (coin - eth), imageId)
+		_, errQuery2 := db.Exec("UPDATE user_wallet SET coin = ? WHERE user_id = ?", (coin - eth), imageId)
 
-		_, errQuery3 := db.Exec("UPDATE iamge SET userId = ? WHERE id = ?", userId, userId)
+		_, errQuery3 := db.Exec("UPDATE image SET userId = ? WHERE id = ?", userId, imageId)
 
 		if errQuery == nil && errQuery1 == nil && errQuery2 == nil && errQuery3 == nil {
 			response.Status = 200
 			response.Message = "success"
 
 		} else {
+			log.Print(errQuery)
+			log.Print(errQuery1)
+			log.Print(errQuery2)
+			log.Print(errQuery3)
 			response.Status = 400
 			response.Message = "internal error"
 		}
@@ -265,7 +265,6 @@ func Buyout(w http.ResponseWriter, r *http.Request) {
 		response.Status = 400
 		response.Message = "uang tidak cukup"
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }

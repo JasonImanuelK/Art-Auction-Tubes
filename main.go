@@ -33,6 +33,8 @@ func main() {
 	router.HandleFunc("/marketlist", controller.Authenticate(controller.GetMarketListByDate, 2)).Methods("POST")
 	router.HandleFunc("/marketlist/id/{id}", controller.Authenticate(controller.GetMarketListById, 2)).Methods("GET")
 	router.HandleFunc("/marketlist/{name}", controller.Authenticate(controller.GetMarketListByName, 2)).Methods("GET")
+	router.HandleFunc("/buyout", controller.Authenticate(controller.Buyout, 2)).Methods("POST")
+	router.HandleFunc("/marketlist/date", controller.Authenticate(controller.GetMarketListByDate, 2)).Methods("POST")
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
