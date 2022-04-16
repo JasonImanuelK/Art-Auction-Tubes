@@ -148,15 +148,14 @@ func GetMarketListByName(w http.ResponseWriter, r *http.Request) {
 	db := connect()
 	defer db.Close()
 
-	err := r.ParseForm()
-	if err != nil {
-		return
-	}
 	vars := mux.Vars(r)
 	name := vars["name"]
-	rows, _ := db.Query(("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.Status FROM marketlist JOIN gambar WHERE gambar.title LIKE '%" + name + "%'"))
+	rows, errQ := db.Query(("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.Status FROM marketlist JOIN gambar WHERE gambar.title LIKE '%" + name + "%'"))
 	var MarketResponse model.MarketResponse
 	var data model.Market
+
+	log.Println(name)
+	log.Println(errQ)
 
 	for rows.Next() {
 		if err := rows.Scan(&data.ID, &data.StartingDate, &data.Deadline, &data.StartingBid, &data.BuyoutBid, &data.DatePosted, &data.ImageId, &data.Status); err != nil {
