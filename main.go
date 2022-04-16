@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	//"os"
+	"os"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -43,7 +42,7 @@ func main() {
 		log.Fatal("Error loading .env file.")
 	}
 
-	//passwordEmail := os.Getenv("PASSWORD_EMAIL")
+	passwordEmail := os.Getenv("PASSWORD_EMAIL")
 
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(24).Hours().Do(func() { fmt.Print("lola") })
