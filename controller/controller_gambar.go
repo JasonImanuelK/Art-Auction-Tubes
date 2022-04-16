@@ -14,10 +14,6 @@ import (
 func ReportPicture(w http.ResponseWriter, r *http.Request) {
 	db := connect()
 	defer db.Close()
-	err := r.ParseForm()
-	if err != nil {
-		return
-	}
 
 	param := mux.Vars(r)
 	id := param["id"]
