@@ -119,10 +119,6 @@ func GetMarketListById(w http.ResponseWriter, r *http.Request) {
 	db := connect()
 	defer db.Close()
 
-	err := r.ParseForm()
-	if err != nil {
-		return
-	}
 	vars := mux.Vars(r)
 	marketId, _ := strconv.Atoi(vars["marketId"])
 
