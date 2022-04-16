@@ -120,7 +120,7 @@ func GetMarketListById(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	vars := mux.Vars(r)
-	marketId, _ := strconv.Atoi(vars["marketId"])
+	marketId, _ := strconv.Atoi(vars["id"])
 
 	rows, _ := db.Query("SELECT *  FROM marketlist WHERE ID = ?", marketId)
 	var MarketResponse model.MarketResponse
@@ -150,7 +150,7 @@ func GetMarketListByName(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	name := vars["name"]
-	rows, errQ := db.Query(("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.Status FROM marketlist JOIN gambar WHERE gambar.title LIKE '%" + name + "%'"))
+	rows, errQ := db.Query(("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.Status FROM marketlist JOIN image WHERE image.title LIKE '%" + name + "%'"))
 	var MarketResponse model.MarketResponse
 	var data model.Market
 
