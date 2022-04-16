@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Art-Auction-Tubes/controller"
 	"github.com/go-co-op/gocron"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
-	"github.com/tubes/Art-Auction-Tubes/controller"
 )
 
 func main() {

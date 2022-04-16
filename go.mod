@@ -1,4 +1,4 @@
-module github.com/ubes/Art-Auction-Tubes
+module github.com/tubes/Art-Auction-Tubes
 
 go 1.17
 
