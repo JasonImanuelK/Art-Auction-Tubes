@@ -150,7 +150,7 @@ func GetMarketListByName(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	name := vars["name"]
-	rows, _ := db.Query(("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.stateStatus FROM marketlist JOIN image WHERE image.title LIKE '%" + name + "%'"))
+	rows, _ := db.Query(("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.stateStatus FROM marketlist JOIN image ON marketlist.imageId = image.id WHERE image.title LIKE '%" + name + "%'"))
 	var MarketResponse model.MarketResponse
 	var data model.Market
 
