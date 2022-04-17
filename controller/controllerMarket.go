@@ -93,7 +93,7 @@ func GetMarketListByDate(w http.ResponseWriter, r *http.Request) {
 	var data model.Market
 
 	for rows.Next() {
-		if err := rows.Scan(&data.ID, &data.StartingDate, &data.Deadline, &data.StartingBid, &data.BuyoutBid, &data.DatePosted, &data.ImageId, &data.Status); err != nil {
+		if err := rows.Scan(&data.ID, &data.StartingDate, &data.Deadline, &data.StartingBid, &data.BuyoutBid, &data.DatePosted, &data.Status, &data.ImageId); err != nil {
 			log.Println(err)
 			MarketResponse.Status = 500
 			MarketResponse.Message = "internal error"
