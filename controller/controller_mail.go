@@ -38,6 +38,7 @@ func SendMail(email []model.ListEmail) {
 		mailer.SetBody("text/html", "Hello "+r.Username+" !"+" you won the bid at "+r.Date.String()+" with "+strconv.FormatFloat(r.Etherium, 'f', 2, 64)+" etherium.")
 
 		totalEtherium = totalEtherium + r.Etherium
+		selesaikanTransaksiCoin(r.ImageId, r.UserIdBuyer, r.Etherium)
 		hapusBid(r.MarketId)
 		gantiStatusMarketList(r.MarketId)
 
@@ -137,7 +138,7 @@ func selesaikanTransaksiCoin(imageId int, userIdBuyer int, etherium float64) {
 
 	tax := getTax()
 
-	_, errQuery3 := db.Exec("UPDATE user_wallet SET coin = coin+? WHERE userId =", (etherium * tax), userIdSeller)
+	_, errQuery3 := db.Exec("UPDATE user_wallet SET coin = coin+? WHERE userId =", (etherium * (1 - tax)), userIdSeller)
 	if errQuery3 != nil {
 		log.Println(errQuery)
 		return
