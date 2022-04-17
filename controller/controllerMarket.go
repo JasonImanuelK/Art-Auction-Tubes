@@ -122,7 +122,7 @@ func GetMarketListById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	marketId, _ := strconv.Atoi(vars["id"])
 
-	rows, _ := db.Query("SELECT *  FROM marketlist WHERE ID = ?", marketId)
+	rows, _ := db.Query("SELECT id,startingDate,deadline,StartingBid,BuyoutBid,DatePosted,ImageId,stateStatus  FROM marketlist WHERE ID = ?", marketId)
 	var MarketResponse model.MarketResponse
 	var data model.Market
 
@@ -269,4 +269,31 @@ func Buyout(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+func GetMarketListByTopBids(w http.ResponseWriter, r *http.Request) {
+	db := connect()
+	defer db.Close()
+
+	rows, _ := db.Query("SELECT marketlist.ID, marketlist.StartingDate, marketlist.Deadline, marketlist.StartingBid, marketlist.BuyoutBid, marketlist.DatePosted, marketlist.ImageId, marketlist.stateStatus, MAX(bid.etherium) FROM marketlist JOIN bid ON bid.marketId=marketlist.id GROUP BY marketlist.id LIMIT 5")
+
+	var MarketResponse model.MarketResponse
+	var data model.Market
+	var eth float64
+	for rows.Next() {
+		if err := rows.Scan(&data.ID, &data.StartingDate, &data.Deadline, &data.StartingBid, &data.BuyoutBid, &data.DatePosted, &data.ImageId, &data.Status, &eth); err != nil {
+			log.Println(err)
+			MarketResponse.Status = 500
+			MarketResponse.Message = "internal error"
+			json.NewEncoder(w).Encode(MarketResponse)
+			return
+		} else {
+			MarketResponse.Data = append(MarketResponse.Data, data)
+			MarketResponse.Status = 200
+			MarketResponse.Message = "Success"
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(MarketResponse)
 }
