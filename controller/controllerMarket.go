@@ -184,8 +184,8 @@ func InsertMarket(w http.ResponseWriter, r *http.Request) {
 
 	StartingDate := r.Form.Get("startingDate")
 	Deadline := r.Form.Get("deadline")
-	StartingBid, _ := strconv.Atoi(r.Form.Get("StartingBid"))
-	BuyoutBid, _ := strconv.Atoi(r.Form.Get("BuyoutBid"))
+	StartingBid, _ := strconv.ParseFloat(r.Form.Get("StartingBid"), 64)
+	BuyoutBid, _ := strconv.ParseFloat(r.Form.Get("BuyoutBid"), 64)
 	DatePosted := r.Form.Get("datePosted")
 	ImageId, _ := strconv.Atoi(r.Form.Get("ImageId"))
 
@@ -218,7 +218,7 @@ func Buyout(w http.ResponseWriter, r *http.Request) {
 	var response model.GeneralResponse
 
 	rows, _ := db.Query("SELECT buyoutBid,imageId  FROM marketlist WHERE ID = ?", marketId)
-	var eth int
+	var eth float64
 	var imageId int
 
 	for rows.Next() {
@@ -231,7 +231,7 @@ func Buyout(w http.ResponseWriter, r *http.Request) {
 
 	rows2, _ := db.Query("SELECT coin FROM user_wallet WHERE user_id = ?", userId)
 
-	var coin int
+	var coin float64
 	for rows2.Next() {
 		if err := rows2.Scan(&coin); err != nil {
 			log.Println(err)
@@ -243,12 +243,14 @@ func Buyout(w http.ResponseWriter, r *http.Request) {
 	if coin >= eth {
 		_, errQuery := db.Exec("UPDATE marketlist SET stateStatus = 0 WHERE id = ?", marketId)
 		_, errQuery1 := db.Exec("INSERT INTO bid (datePosted,etherium,userId,marketId) values (?,?,?,?)", time.Now().Format("2022-04-08"), eth, userId, marketId)
+		//tambah income
+		var tax float64 = TambahIncome(eth)
 
-		_, errQuery2 := db.Exec("UPDATE user_wallet SET coin = ? WHERE user_id = ?", (coin - eth), imageId)
-
+		_, errQuery2 := db.Exec("UPDATE user_wallet SET coin = ? WHERE user_id = ?", (coin - eth), userId)
+		_, errQuery4 := db.Exec("UPDATE user_wallet JOIN image ON user_wallet.user_id = image.userId JOIN marketlist ON marketlist.imageId = image.id AND image.id = ? SET user_wallet.coin = user_wallet.coin + ?", imageId, (eth - tax))
 		_, errQuery3 := db.Exec("UPDATE image SET userId = ? WHERE id = ?", userId, imageId)
 
-		if errQuery == nil && errQuery1 == nil && errQuery2 == nil && errQuery3 == nil {
+		if errQuery == nil && errQuery1 == nil && errQuery2 == nil && errQuery3 == nil && errQuery4 == nil {
 			response.Status = 200
 			response.Message = "success"
 

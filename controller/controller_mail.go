@@ -46,11 +46,11 @@ func SendMail(email []model.ListEmail) {
 		}
 		mailer.Reset()
 	}
-	tambahIncome(totalEtherium)
+	TambahIncome(totalEtherium)
 	log.Println("Mail sent!")
 }
 
-func tambahIncome(totalEth float64) {
+func TambahIncome(totalEth float64) float64 {
 	db := connect()
 	defer db.Close()
 
@@ -58,7 +58,7 @@ func tambahIncome(totalEth float64) {
 	err := db.QueryRow("SELECT tax FROM accounting").Scan(&tax)
 	if err != nil {
 		log.Print(err)
-		return
+		return -1
 	}
 
 	totalIncome := totalEth * tax
@@ -70,6 +70,7 @@ func tambahIncome(totalEth float64) {
 	} else {
 		log.Println("Income berhasil ditambahkan.")
 	}
+	return totalIncome
 }
 
 func hapusBid(marketId int) {
