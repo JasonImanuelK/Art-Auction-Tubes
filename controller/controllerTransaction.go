@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,14 +12,13 @@ func GetLatestTransaction(w http.ResponseWriter, r *http.Request) {
 	db := connect()
 	defer db.Close()
 	query := "SELECT * FROM marketlist WHERE stateStatus = 1 ORDER BY datePosted DESC ;"
-
+	w.Header().Set("Content-Type", "application/json")
 	rows, err := db.Query(query)
 	var response model.MarketResponse
 
 	if err != nil {
 		response.Status = 500
 		response.Message = "Internal Server Error;" + err.Error()
-		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 		return
 	}
@@ -30,23 +28,19 @@ func GetLatestTransaction(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 
-		var checkStartingDate sql.NullTime
-		var checkDeadline sql.NullTime
-		var checkDatePosted sql.NullTime
-		if err := rows.Scan(&market.ID, checkStartingDate, checkDeadline, &market.StartingBid, &market.BuyoutBid, checkDatePosted, &market.Status, &market.ImageId); err != nil {
+		if err := rows.Scan(&market.ID, &market.StartingDate, &market.Deadline, &market.StartingBid, &market.BuyoutBid, &market.DatePosted, &market.Status, &market.ImageId); err != nil {
 			fmt.Println(err.Error())
 		} else {
 			markets = append(markets, market)
 		}
 	}
-	if len(markets) > 0 {
+	if err == nil {
 		response.Status = 200
 		response.Message = "Success"
+		response.Data = markets
 	} else {
 		response.Status = 404
 		response.Message = "Error - Data Not Found with Authentication Provided"
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }

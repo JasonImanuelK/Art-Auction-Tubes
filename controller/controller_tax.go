@@ -2,34 +2,33 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/tubes/Art-Auction-Tubes/model"
 )
 
-func InsertTax(w http.ResponseWriter, r *http.Request) {
+func UpdateTax(w http.ResponseWriter, r *http.Request) {
 	db := connect()
 	defer db.Close()
 	err := r.ParseForm()
-	var response model.AccountingResponse
+	var response model.GeneralResponse
+	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
+		response.Status = 400
+		response.Message = "Bad Request"
+		json.NewEncoder(w).Encode(response)
 		return
 	}
+	tax := r.Form.Get("tax")
+	_, errQuery := db.Exec("UPDATE accounting SET TAX = ?", tax)
 
-	tax, _ := strconv.Atoi(r.Form.Get("tax"))
-	income, _ := strconv.Atoi(r.Form.Get("income"))
-	_, errQuery := db.Exec("INSERT INTO accounting(tax,income) VALUES (?,?);", tax, income)
-	if errQuery != nil {
-		log.Print(errQuery.Error())
-		response.Status = 400
-		response.Message = "Bad Request - Insert Failed"
+	if errQuery == nil {
+		response.Status = 200
+		response.Message = "Success"
 		json.NewEncoder(w).Encode(response)
 	} else {
-		response.Status = 200
-		response.Message = "Success Insert"
+		response.Status = 400
+		response.Message = "Bad Request"
 		json.NewEncoder(w).Encode(response)
 	}
 
@@ -38,41 +37,20 @@ func InsertTax(w http.ResponseWriter, r *http.Request) {
 func GetTax(w http.ResponseWriter, r *http.Request) {
 	db := connect()
 	defer db.Close()
-	query := "SELECT tax FROM accounting WHERE accounting.tax= ? "
-	err := r.ParseForm()
-	if err != nil {
-		return
-	}
-	tax := r.Form.Get("tax")
-	rows, err := db.Query(query, tax)
+	query := "SELECT tax FROM accounting"
+	var tax float64
+	err := db.QueryRow(query).Scan(&tax)
 
-	var response model.AccountingsResponse
+	var response model.TaxResponse
+	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		response.Status = 500
 		response.Message = "Internal Server Error;" + err.Error()
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-
-	var accounts []model.Accounting
-	for rows.Next() {
-		var tax model.Accounting
-		if err := rows.Scan(&tax.Tax); err != nil {
-			fmt.Println(err.Error())
-		} else {
-			accounts = append(accounts, tax)
-		}
-	}
-	if len(accounts) > 0 {
+	} else {
 		response.Status = 200
 		response.Message = "Success"
-		response.Data = accounts
-	} else {
-		response.Status = 404
-		response.Message = "Error - Data Not Found with Authentication Provided"
+		response.Tax = tax
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
