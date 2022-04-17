@@ -18,7 +18,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	param := mux.Vars(r)
 	key := param["key"]
 
-	query := "SELECT a.id, a.username, a.email, a.password, a.blockedStatus, SUM(b.report) FROM user a JOIN image b ON a.id = b.userId WHERE a.userType = 0 AND a.blockedStatus = 0"
+	query := "SELECT a.id, a.username, a.email, a.blockedStatus, SUM(b.report) FROM user a JOIN image b ON a.id = b.userId WHERE a.userType = 0 AND a.blockedStatus = 0"
 
 	if key != "" {
 		query += " AND a.username LIKE '%" + key + "%'"
@@ -34,7 +34,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	var temp int
 
 	for rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &temp, &user.CountReport); err != nil {
+		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &temp, &user.CountReport); err != nil {
 			log.Fatal(err.Error())
 		} else {
 			if temp == 0 {
