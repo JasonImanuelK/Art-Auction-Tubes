@@ -84,11 +84,13 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	password := r.Form.Get("password")
 	email := r.Form.Get("email")
 	hashedPassword, _ := hashPassword(password)
+	etherium_key := r.Form.Get("etherium_key")
+	etherium_password := r.Form.Get("etherium_password")
+	coin := r.Form.Get("coin")
 
 	var id int
 	var hash string
 	_, errQuery := db.Exec("INSERT INTO user(username, password, email,blockedStatus,userType) values (?,?,?,0,0)", username, hashedPassword, email)
-
 	if errQuery != nil {
 		response.Status = 400
 		response.Message = "Bad Request"
@@ -106,6 +108,18 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if err := rows.Scan(&id, &hash); err == nil {
 		match := CheckPasswordHash(password, hash)
 		if match {
+			_, errQuery2 := db.Exec("INSERT INTO user_wallet values (?,?,?,?)", etherium_key, etherium_password, coin, id)
+			if errQuery2 != nil {
+				response.Status = 400
+				response.Message = "Bad Request"
+				_, errQuery3 := db.Exec("DELETE FROM user WHERE id = ?", id)
+				if errQuery3 != nil {
+					log.Println(errQuery)
+				}
+
+				json.NewEncoder(w).Encode(response)
+				return
+			}
 			response.Status = 200
 			response.Message = "Register Success"
 			generateToken(w, id, username, 0)
