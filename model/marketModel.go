@@ -1,14 +1,16 @@
 package model
 
+import "time"
+
 type Market struct {
-	ID           int     `json:"ID"`
-	StartingDate string  `json:"startingDate"`
-	Deadline     string  `json:"deadline"`
-	StartingBid  float64 `json:"startingBid"`
-	BuyoutBid    float64 `json:"buyoutBid"`
-	DatePosted   string  `json:"datePosted"`
-	ImageId      int     `json:"imageId"`
-	Status       bool    `json:"status"`
+	ID           int       `json:"ID"`
+	StartingDate time.Time `json:"startingDate"`
+	Deadline     time.Time `json:"deadline"`
+	StartingBid  float64   `json:"startingBid"`
+	BuyoutBid    float64   `json:"buyoutBid"`
+	DatePosted   time.Time `json:"datePosted"`
+	ImageId      int       `json:"imageId"`
+	Status       bool      `json:"status"`
 }
 
 type MarketResponse struct {

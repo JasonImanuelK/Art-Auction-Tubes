@@ -52,19 +52,14 @@ type BidsResponse struct {
 	Data    []Bid  `json:"data"`
 }
 
-type Accounting struct {
-	Tax    float64 `json:"tax"`
-	Income float64 `json:"income"`
+type TaxResponse struct {
+	Status  int     `json:"status"`
+	Message string  `json:"message"`
+	Tax     float64 `json:"tax"`
 }
 
-type AccountingResponse struct {
-	Status  int        `json:"status"`
-	Message string     `json:"message"`
-	Data    Accounting `json:"data"`
-}
-
-type AccountingsResponse struct {
-	Status  int          `json:"status"`
-	Message string       `json:"message"`
-	Data    []Accounting `json:"data"`
+type IncomeResponse struct {
+	Status  int     `json:"status"`
+	Message string  `json:"message"`
+	Income  float64 `json:"income"`
 }

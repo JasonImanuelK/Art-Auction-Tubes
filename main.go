@@ -29,11 +29,11 @@ func main() {
 	router.HandleFunc("/users/{id}", controller.Authenticate(controller.ChangeBanStatus, 1)).Methods("PUT")
 
 	//Timotius
-	router.HandleFunc("/bid", controller.InsertBid).Methods("POST")
-	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods("GET")
-	router.HandleFunc("/tax", controller.InsertTax).Methods("PUT")
-	router.HandleFunc("/tax", controller.GetTax).Methods("GET")
-	router.HandleFunc("/income", controller.GetIncome).Methods("GET")
+	router.HandleFunc("/bid", controller.Authenticate(controller.InsertBid, 0)).Methods("POST")
+	router.HandleFunc("/transaction", controller.Authenticate(controller.GetLatestTransaction, 2)).Methods("GET")
+	router.HandleFunc("/tax", controller.Authenticate(controller.UpdateTax, 1)).Methods("PUT")
+	router.HandleFunc("/tax", controller.Authenticate(controller.GetTax, 1)).Methods("GET")
+	router.HandleFunc("/income", controller.Authenticate(controller.GetIncome, 1)).Methods("GET")
 
 	//james
 	router.HandleFunc("/marketlist", controller.Authenticate(controller.InsertMarket, 0)).Methods("POST")
