@@ -189,7 +189,7 @@ func InsertMarket(w http.ResponseWriter, r *http.Request) {
 	DatePosted := r.Form.Get("datePosted")
 	ImageId, _ := strconv.Atoi(r.Form.Get("ImageId"))
 
-	_, errQuery := db.Exec("INSERT INTO marketlist (startingDate,deadline,startingBid,buyoutBid,datePosted,imageId,stateStatus) values (?,?,?,?,?,?,'active')", StartingDate, Deadline, StartingBid, BuyoutBid, DatePosted, ImageId)
+	_, errQuery := db.Exec("INSERT INTO marketlist (startingDate,deadline,startingBid,buyoutBid,datePosted,imageId,stateStatus) values (?,?,?,?,?,?,1)", StartingDate, Deadline, StartingBid, BuyoutBid, DatePosted, ImageId)
 
 	var response model.GeneralResponse
 	if errQuery == nil {
