@@ -31,7 +31,7 @@ func main() {
 	//Timotius
 	router.HandleFunc("/bid", controller.InsertBid).Methods("POST")
 	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods("GET")
-	router.HandleFunc("/tax", controller.InsertTax).Methods("POST")
+	router.HandleFunc("/tax", controller.InsertTax).Methods("PUT")
 	router.HandleFunc("/tax", controller.GetTax).Methods("GET")
 	router.HandleFunc("/income", controller.GetIncome).Methods("GET")
 
@@ -39,8 +39,8 @@ func main() {
 	router.HandleFunc("/marketlist", controller.Authenticate(controller.InsertMarket, 0)).Methods("POST")
 	router.HandleFunc("/marketlist/id/{id}", controller.Authenticate(controller.GetMarketListById, 2)).Methods("GET")
 	router.HandleFunc("/marketlist/{name}", controller.Authenticate(controller.GetMarketListByName, 2)).Methods("GET")
-	router.HandleFunc("/buyout", controller.Authenticate(controller.Buyout, 0)).Methods("POST")
-	router.HandleFunc("/marketlistdate", controller.Authenticate(controller.GetMarketListByDate, 2)).Methods("POST")
+	router.HandleFunc("/buyout", controller.Authenticate(controller.Buyout, 0)).Methods("PUT")
+	router.HandleFunc("/marketlist/date", controller.Authenticate(controller.GetMarketListByDate, 2)).Methods("PUT")
 	router.HandleFunc("/marketlistbybids", controller.Authenticate(controller.GetMarketListByTopBids, 2)).Methods("GET")
 
 	corsHandler := cors.New(cors.Options{
