@@ -50,7 +50,7 @@ func SendMail(email []model.ListEmail) {
 	log.Println("Mail sent!")
 }
 
-func TambahIncome(totalEth float64) float64 {
+func getTax() float64 {
 	db := connect()
 	defer db.Close()
 
@@ -58,8 +58,17 @@ func TambahIncome(totalEth float64) float64 {
 	err := db.QueryRow("SELECT tax FROM accounting").Scan(&tax)
 	if err != nil {
 		log.Print(err)
-		return -1
+		return 0
+	} else {
+		return tax
 	}
+}
+
+func TambahIncome(totalEth float64) float64 {
+	db := connect()
+	defer db.Close()
+
+	tax := getTax()
 
 	totalIncome := totalEth * tax
 
@@ -97,4 +106,43 @@ func gantiStatusMarketList(marketId int) {
 	} else {
 		log.Println("MarketList dengan id " + strconv.Itoa(marketId) + " sudah ditutup.")
 	}
+}
+
+func selesaikanTransaksiCoin(imageId int, userIdBuyer int, etherium float64) {
+	db := connect()
+	defer db.Close()
+
+	_, errQuery := db.Exec("UPDATE user_wallet SET coin = coin-? WHERE userId =", etherium, userIdBuyer)
+	if errQuery != nil {
+		log.Println(errQuery)
+		return
+	} else {
+		log.Println("Coin buyer berkurang.")
+	}
+
+	var userIdSeller int
+	err := db.QueryRow("SELECT userId FROM image WHERE id = ?", imageId).Scan(&userIdSeller)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	_, errQuery2 := db.Exec("UPDATE image SET userId = ?", userIdBuyer)
+	if errQuery2 != nil {
+		log.Println(errQuery)
+		return
+	} else {
+		log.Println("Kepemilikan gambar berhasil diganti.")
+	}
+
+	tax := getTax()
+
+	_, errQuery3 := db.Exec("UPDATE user_wallet SET coin = coin+? WHERE userId =", (etherium * tax), userIdSeller)
+	if errQuery3 != nil {
+		log.Println(errQuery)
+		return
+	} else {
+		log.Println("Coin seller bertambah.")
+	}
+
 }

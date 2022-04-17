@@ -21,19 +21,25 @@ func main() {
 	router.HandleFunc("/register", controller.Register).Methods("POST")
 	router.HandleFunc("/login", controller.Login).Methods("POST")
 	router.HandleFunc("/logout", controller.Authenticate(controller.Logout, 2)).Methods("GET")
+
+	//Valentinus
 	router.HandleFunc("/picture/{id}", controller.Authenticate(controller.ReportPicture, 0)).Methods("PUT")
-	router.HandleFunc("/users", controller.Authenticate(controller.GetUsers, 2)).Methods("GET")
-	router.HandleFunc("/users/{key}", controller.Authenticate(controller.GetUsers, 2)).Methods("GET")
+	router.HandleFunc("/users", controller.Authenticate(controller.GetUsers, 1)).Methods("GET")
+	router.HandleFunc("/users/{key}", controller.Authenticate(controller.GetUsers, 1)).Methods("GET")
 	router.HandleFunc("/users/{id}", controller.Authenticate(controller.ChangeBanStatus, 1)).Methods("PUT")
+
+	//Timotius
 	router.HandleFunc("/bid", controller.InsertBid).Methods("POST")
 	router.HandleFunc("/transaction", controller.GetLatestTransaction).Methods("GET")
 	router.HandleFunc("/tax", controller.InsertTax).Methods("POST")
 	router.HandleFunc("/tax", controller.GetTax).Methods("GET")
-	//router.HandleFunc("/income",coontroller.GetIncome).Methods("GET")
-	router.HandleFunc("/marketlist", controller.Authenticate(controller.GetMarketListByDate, 2)).Methods("POST")
+	router.HandleFunc("/income", controller.GetIncome).Methods("GET")
+
+	//james
+	router.HandleFunc("/marketlist", controller.Authenticate(controller.InsertMarket, 0)).Methods("POST")
 	router.HandleFunc("/marketlist/id/{id}", controller.Authenticate(controller.GetMarketListById, 2)).Methods("GET")
 	router.HandleFunc("/marketlist/{name}", controller.Authenticate(controller.GetMarketListByName, 2)).Methods("GET")
-	router.HandleFunc("/buyout", controller.Authenticate(controller.Buyout, 2)).Methods("POST")
+	router.HandleFunc("/buyout", controller.Authenticate(controller.Buyout, 0)).Methods("POST")
 	router.HandleFunc("/marketlist/date", controller.Authenticate(controller.GetMarketListByDate, 2)).Methods("POST")
 
 	corsHandler := cors.New(cors.Options{
