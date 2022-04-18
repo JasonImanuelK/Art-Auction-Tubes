@@ -18,10 +18,10 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	param := mux.Vars(r)
 	key := param["key"]
 
-	query := "SELECT id, username, email, password, blockedStatus FROM user WHERE userType = 0 AND blockedStatus = 0"
+	query := "SELECT a.id, a.username, a.email, a.blockedStatus, SUM(b.report) FROM user a JOIN image b ON a.id = b.userId WHERE a.userType = 0 AND a.blockedStatus = 0"
 
 	if key != "" {
-		query += " AND username LIKE '%" + key + "%'"
+		query += " AND a.username LIKE '%" + key + "%'"
 	}
 
 	rows, err := db.Query(query)
@@ -29,12 +29,12 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
-	var user model.User
-	var users []model.User
+	var user model.UserDTO
+	var users []model.UserDTO
 	var temp int
 
 	for rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &temp); err != nil {
+		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &temp, &user.CountReport); err != nil {
 			log.Fatal(err.Error())
 		} else {
 			if temp == 0 {
@@ -46,7 +46,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var response model.UserResponse
+	var response model.UserDTOResponse
 	if len(users) > 0 {
 		response.Status = 200
 		response.Message = "Success Get Users"
