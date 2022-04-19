@@ -42,6 +42,7 @@ func main() {
 	router.HandleFunc("/buyout", controller.Authenticate(controller.Buyout, 0)).Methods("PUT")
 	router.HandleFunc("/marketlist/date", controller.Authenticate(controller.GetMarketListByDate, 2)).Methods("POST")
 	router.HandleFunc("/marketlistbybids", controller.Authenticate(controller.GetMarketListByTopBids, 2)).Methods("GET")
+	router.HandleFunc("/resetRedis", controller.Authenticate(controller.ResetRedis, 2)).Methods("POST")
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

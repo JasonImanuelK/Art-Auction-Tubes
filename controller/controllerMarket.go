@@ -71,8 +71,6 @@ func GetMarketListByDate(w http.ResponseWriter, r *http.Request) {
 
 	email := r.Form.Get("email")
 
-	log.Print(email)
-
 	current, err1 := client.Get(ctx, email).Result()
 
 	current2, _ := strconv.Atoi(current)
