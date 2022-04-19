@@ -32,6 +32,11 @@ func CekDeadline() {
 			listEmails = append(listEmails, listEmail)
 		}
 	}
+	
+	if(true){
+	}else{
+	}
+	
 
 	SendMail(listEmails)
 }
