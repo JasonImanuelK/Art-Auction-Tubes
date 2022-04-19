@@ -113,7 +113,7 @@ func selesaikanTransaksiCoin(imageId int, userIdBuyer int, etherium float64) {
 	db := connect()
 	defer db.Close()
 
-	_, errQuery := db.Exec("UPDATE user_wallet SET coin = coin-? WHERE userId =", etherium, userIdBuyer)
+	_, errQuery := db.Exec("UPDATE user_wallet SET coin = coin-? WHERE user_id =", etherium, userIdBuyer)
 	if errQuery != nil {
 		log.Println(errQuery)
 		return
@@ -138,7 +138,7 @@ func selesaikanTransaksiCoin(imageId int, userIdBuyer int, etherium float64) {
 
 	tax := getTax()
 
-	_, errQuery3 := db.Exec("UPDATE user_wallet SET coin = coin+? WHERE userId =", (etherium * (1 - tax)), userIdSeller)
+	_, errQuery3 := db.Exec("UPDATE user_wallet SET coin = coin+? WHERE user_id =", (etherium * (1 - tax)), userIdSeller)
 	if errQuery3 != nil {
 		log.Println(errQuery)
 		return

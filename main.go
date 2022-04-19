@@ -64,6 +64,7 @@ func main() {
 	}
 
 	s := gocron.NewScheduler(time.UTC)
+	//s.Every(10).Seconds().Do(func(){ controller.CekDeadline() })
 	s.Every(1).Day().At("23:59").Do(func() { controller.CekDeadline() })
 	s.StartBlocking()
 
