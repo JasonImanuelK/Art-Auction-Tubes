@@ -197,6 +197,7 @@ func InsertMarket(w http.ResponseWriter, r *http.Request) {
 		response.Message = "success"
 
 	} else {
+		log.Print(errQuery)
 		response.Status = 400
 		response.Message = "insert failed"
 	}
